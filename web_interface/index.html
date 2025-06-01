@@ -68,8 +68,8 @@
 
     const isManualTopic = new ROSLIB.Topic({
       ros: ros,
-      name: '/is_manual',
-      messageType: 'std_msgs/Bool'
+      name: '/orca_00/control_state',
+      messageType: 'std_msgs/msg/Int32'
     });
 
     function sendManual(value) {
@@ -80,7 +80,7 @@
     // is_enable service client
     const isEnableService = new ROSLIB.Service({
       ros: ros,
-      name: '/is_enable',
+      name: '/orca_00/enable',
       serviceType: 'std_srvs/srv/Empty'
     });
 
