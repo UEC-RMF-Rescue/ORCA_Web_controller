@@ -9,7 +9,6 @@ class OrcaWebController(Node):
 
         # Publisher（Webから受け取って処理したいならsubscriberも必要）
         self.pub = self.create_publisher(Int32, '/orca_00/control_state', 10)
-        self.sub = self.create_subscription(Int32, 'control_state', self.control_state_callback, 10)
 
         # Services
         self.set_offset_srv = self.create_service(Empty, '/orca_00/set_offset', self.handle_set_offset)
@@ -26,9 +25,6 @@ class OrcaWebController(Node):
     def handle_enable(self, request, response):
         self.get_logger().info('orca_00 enabled')
         return response
-
-    def control_state_callback(self, msg):
-        self.get_logger().info(f'Received control_state: {msg.data}')
 
 def main(args=None):
     rclpy.init(args=args)
