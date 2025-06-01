@@ -15,7 +15,6 @@ class OrcaWebController(Node):
         self.enable_srv = self.create_service(Empty, '/orca_00/enable', self.handle_enable)
         self.disable_srv = self.create_service(Empty, '/orca_00/disenable', self.handle_enable)
         
-
         self.enabled = False
 
     def handle_set_offset(self, request, response):
@@ -23,7 +22,7 @@ class OrcaWebController(Node):
         return response
 
     def handle_enable(self, request, response):
-        self.get_logger().info('orca_00 enabled')
+        self.get_logger().info('orca_00  : enabled')
         return response
 
 def main(args=None):

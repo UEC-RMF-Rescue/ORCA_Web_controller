@@ -21,8 +21,8 @@
                 <video id="camera" autoplay muted></video>
 
                 <div class="button-group">
-                    <button onclick="sendManual(true)">Manual</button>
-                    <button onclick="sendManual(false)">Auto</button>
+                    <button onclick="sendControlState(0)">Manual</button>
+                    <button onclick="sendControlState(1)">Auto</button>
                 </div>
             </div>
             <div class="camera-box">
@@ -30,8 +30,8 @@
                 <video id="camera" autoplay muted></video>
 
                 <div class="button-group">
-                    <button onclick="sendManual(true)">Manual</button>
-                    <button onclick="sendManual(false)">Auto</button>
+                    <button onclick="sendControlState(0)">Manual</button>
+                    <button onclick="sendControlState(1)">Auto</button>
                 </div>
             </div>
             <div class="camera-box">
@@ -39,8 +39,8 @@
                 <video id="camera" autoplay muted></video>
 
                 <div class="button-group">
-                    <button onclick="sendManual(true)">Manual</button>
-                    <button onclick="sendManual(false)">Auto</button>
+                    <button onclick="sendControlState(0)">Manual</button>
+                    <button onclick="sendControlState(1)">Auto</button>
                 </div>
             </div>
         </div>
@@ -72,7 +72,7 @@
       messageType: 'std_msgs/msg/Int32'
     });
 
-    function sendManual(value) {
+    function sendControlState(value) {
       const msg = new ROSLIB.Message({ data: value });
       isManualTopic.publish(msg);
       console.log("📤 Sent is_manual:", value);
