@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import Bool
+from std_msgs.msg import Int32
 from std_srvs.srv import Empty
 
 class OrcaWebController(Node):
@@ -8,25 +8,27 @@ class OrcaWebController(Node):
         super().__init__('orca_web_controller')
 
         # Publisher（Webから受け取って処理したいならsubscriberも必要）
-        self.pub = self.create_publisher(Bool, 'is_manual', 10)
-        self.sub = self.create_subscription(Bool, 'is_manual', self.is_manual_callback, 10)
+        self.pub = self.create_publisher(Int32, '/orca_00/control_state', 10)
+        self.sub = self.create_subscription(Int32, 'control_state', self.control_state_callback, 10)
 
         # Services
-        self.set_offset_srv = self.create_service(Empty, 'set_offset', self.handle_set_offset)
-        self.is_enable_srv = self.create_service(Empty, 'is_enable', self.handle_is_enable)
+        self.set_offset_srv = self.create_service(Empty, '/orca_00/set_offset', self.handle_set_offset)
+        self.enable_srv = self.create_service(Empty, '/orca_00/enable', self.handle_enable)
+        self.disable_srv = self.create_service(Empty, '/orca_00/disenable', self.handle_enable)
+        
 
         self.enabled = False
 
     def handle_set_offset(self, request, response):
-        self.get_logger().info('offset is called')
+        self.get_logger().info('orca_00 : offset is called')
         return response
 
-    def handle_is_enable(self, request, response):
-        self.get_logger().info('isEnable is called')
+    def handle_enable(self, request, response):
+        self.get_logger().info('orca_00 enabled')
         return response
 
-    def is_manual_callback(self, msg):
-        self.get_logger().info(f'Received is_manual: {msg.data}')
+    def control_state_callback(self, msg):
+        self.get_logger().info(f'Received control_state: {msg.data}')
 
 def main(args=None):
     rclpy.init(args=args)
