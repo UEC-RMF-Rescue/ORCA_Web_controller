@@ -4,69 +4,44 @@
   <meta charset="UTF-8">
   <title>Robot Controller + Camera</title>
   <script src="https://cdn.jsdelivr.net/npm/roslib/build/roslib.min.js"></script>
-  <!-- 外部CSSファイルを読み込み -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>ORCA丸山ロボット</h1>
-    <div id="wrapper">
-        <div id="controll-block">
-            <h1>何か入る</h1>
-            <h2>デザイン調整と他トピックとサービスはこの後追加します</h2>
-        </div>
-
-        <div id="camera-block">
-            <div class="camera-box">
-                <div id="status">状態: 未確認</div>
-                <video id="camera" autoplay muted></video>
-
-                <div class="button-group">
-                    <button onclick="sendControlState(0)">Manual</button>
-                    <button onclick="sendControlState(1)">Auto</button>
-                </div>
-            </div>
-            <div class="camera-box">
-                <div id="status">状態: 未確認</div>
-                <video id="camera" autoplay muted></video>
-
-                <div class="button-group">
-                    <button onclick="sendControlState(0)">Manual</button>
-                    <button onclick="sendControlState(1)">Auto</button>
-                </div>
-            </div>
-            <div class="camera-box">
-                <div id="status">状態: 未確認</div>
-                <video id="camera" autoplay muted></video>
-
-                <div class="button-group">
-                    <button onclick="sendControlState(0)">Manual</button>
-                    <button onclick="sendControlState(1)">Auto</button>
-                </div>
-            </div>
-        </div>
+  <h1>ORCA丸山ロボット</h1>
+  <div id="wrapper">
+    <div id="controll-block">
+      <h1>nanikahairu</h1>
+      <h2>dezaintyouseisuru</h2>
     </div>
-
-
+    <div id="camera-block">
+      <h1>操作ブロック</h1>
+      <button onclick="callEnable()"> enable 呼び出し</button>
+      <button onclick="callDisable()"> disable 呼び出し</button>
+      <button onclick="callSetOffset()"> set_offset 呼び出し</button>
+      <div class="camera-box">
+        <div id="status">状態: 未確認</div>
+        <video id="camera" autoplay muted></video>
+        <div class="button-group">
+          <button onclick="sendControlState(0)">Manual</button>
+          <button onclick="sendControlState(1)">Auto</button>
+        </div>
+      </div>
+      <!-- 追加のカメラボックスはここに同様に配置 -->
+    </div>
+  </div>
 
   <script>
-    // カメラ表示処理
     const video = document.getElementById('camera');
     navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-      .then((stream) => {
-        video.srcObject = stream;
-      })
-      .catch((err) => {
-        console.error("カメラにアクセスできませんでした:", err);
-      });
+      .then((stream) => { video.srcObject = stream; })
+      .catch((err) => { console.error("カメラにアクセスできませんでした:", err); });
 
-    // ROS連携処理
     const ros = new ROSLIB.Ros({ url: "ws://localhost:9090" });
-
     ros.on('connection', () => console.log("✅ Connected to rosbridge"));
     ros.on('error', (err) => console.error("❌ Error:", err));
     ros.on('close', () => console.log("🔌 Connection closed."));
 
-    const isManualTopic = new ROSLIB.Topic({
+    const controlStateTopic = new ROSLIB.Topic({
       ros: ros,
       name: '/orca_00/control_state',
       messageType: 'std_msgs/msg/Int32'
@@ -74,29 +49,64 @@
 
     function sendControlState(value) {
       const msg = new ROSLIB.Message({ data: value });
-      isManualTopic.publish(msg);
-      console.log("📤 Sent is_manual:", value);
+      controlStateTopic.publish(msg);
+      console.log("📤 Sent /orca_00/control_state:", value);
     }
-    // is_enable service client
-    const isEnableService = new ROSLIB.Service({
+
+    // サービス定義
+    const enableService = new ROSLIB.Service({
       ros: ros,
       name: '/orca_00/enable',
       serviceType: 'std_srvs/srv/Empty'
     });
 
-    // 状態を取得してUI更新
-    function updateStatus() {
+    const disableService = new ROSLIB.Service({
+      ros: ros,
+      name: '/orca_00/disenable',
+      serviceType: 'std_srvs/srv/Empty'
+    });
+
+    const setOffsetService = new ROSLIB.Service({
+      ros: ros,
+      name: '/orca_00/set_offset',
+      serviceType: 'std_srvs/srv/Empty'
+    });
+
+    // 状態表示用トピック購読（Bool型）
+    const enabledStateSub = new ROSLIB.Topic({
+      ros: ros,
+      name: '/orca_00/enabled_state',
+      messageType: 'std_msgs/Bool'
+    });
+
+    enabledStateSub.subscribe((msg) => {
+      const state = msg.data ? ' Enabled' : 'Disabled';
+      document.getElementById("status").innerText = `状態: ${state}`;
+    });
+
+    function callEnable() {
       const request = new ROSLIB.ServiceRequest({});
-      isEnableService.callService(request, (result) => {
-        // std_srvs/Empty はレスポンスデータを持たないため、何か出力したい場合は拡張が必要
-        document.getElementById("status").innerText = "状態: enable（応答あり）";
-      }, (error) => {
-        document.getElementById("status").innerText = "状態: 無効 or 応答なし";
-        console.warn("Service call failed:", error);
-      });
+      enableService.callService(request,
+        () => console.log("enable 呼び出し成功"),
+        (error) => console.warn("enable 呼び出し失敗:", error)
+      );
     }
 
-    setInterval(updateStatus, 10000);
+    function callDisable() {
+      const request = new ROSLIB.ServiceRequest({});
+      disableService.callService(request,
+        () => console.log("disable 呼び出し成功"),
+        (error) => console.warn("disable 呼び出し失敗:", error)
+      );
+    }
+
+    function callSetOffset() {
+      const request = new ROSLIB.ServiceRequest({});
+      setOffsetService.callService(request,
+        () => console.log("set_offset 呼び出し成功"),
+        (error) => console.warn("set_offset 呼び出し失敗:", error)
+      );
+    }
   </script>
 </body>
 </html>
