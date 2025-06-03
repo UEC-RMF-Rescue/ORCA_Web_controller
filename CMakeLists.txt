@@ -13,6 +13,11 @@ install(PROGRAMS
   DESTINATION lib/${PROJECT_NAME}
 )
 
+# install html dir
+install(
+  DIRECTORY web_interface launch
+  DESTINATION share/${PROJECT_NAME})
+
 rosidl_target_interfaces(${PROJECT_NAME}
   ${PROJECT_NAME}
   INTERFACE
