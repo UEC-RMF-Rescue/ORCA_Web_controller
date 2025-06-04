@@ -49,6 +49,7 @@ h1 {
   gap:10px;
   width: 80px;
   height: 40px;
+  z-index: 10;
 }
 
 button {
@@ -61,13 +62,13 @@ button {
   display: flex;
 }
 
-#enable-button{
-  background-color: rgba(46, 125, 228, 0.7);
+#enable-orca_00, #enable-orca_01, #enable-orca_02{
+  background-color: rgba(255, 0, 0, 0.6); 
   border-radius: 5px;
 }
 
-#disable-button{
-  background-color: rgba(255, 0, 0, 0.6);  
+#disable-orca_00, #disable-orca_01, #disable-orca_02{
+  background-color: rgba(46, 125, 228, 0.7);
   border-radius: 5px;
 }
 
