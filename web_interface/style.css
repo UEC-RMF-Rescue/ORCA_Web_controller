@@ -16,7 +16,13 @@ body {
 }
 
 #camera-block{
-    display: block;
+  display: block;
+  align-items: stretch;
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 800px;
+  height: 250px;
+  position: relative;
 }
 
 h1 {
@@ -24,24 +30,79 @@ h1 {
 }
 
 #camera {
-  width: 440px;
-  height: 280px;
+  width: 300px;
+  height: 200px;
   border: 2px solid #333;
   border-radius: 8px;
-  margin-bottom: 20px;
 }
 
 .camera-box{
     display: flex;
+    flex: 1;
+    padding: 10px;
 }
 
 .button-group {
   display: flex;
-  gap: 20px;
+  flex-direction: column;
+  padding-left: 5px;
+  gap:10px;
+  width: 80px;
+  height: 40px;
 }
 
 button {
   font-size: 18px;
   padding: 10px 20px;
   cursor: pointer;
+}
+
+.isEnabled{
+  display: flex;
+}
+
+#enable-button{
+  background-color: rgba(46, 125, 228, 0.7);
+  border-radius: 5px;
+}
+
+#disable-button{
+  background-color: rgba(255, 0, 0, 0.6);  
+  border-radius: 5px;
+}
+
+#manual-bg-button{
+  background-color: #60f760;
+}
+
+#auto-bg-button{
+  background-color: #3c3cfc;
+}
+
+.camera-box video {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.is-enable {
+  width: 550px;
+  display: flex;
+  font-size: 20px;
+  padding-left: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  color: white;
+  user-select: none;
+  transition: background-color 0.3s;
+  border-radius: 10px;
+}
+
+.is-enable.manual {
+  background-color: rgba(63, 218, 55, 0.349);
+}
+
+.is-enable.auto {
+  background-color: rgba(43, 128, 255, 0.301);
 }

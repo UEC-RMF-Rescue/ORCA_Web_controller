@@ -24,13 +24,13 @@ class OrcaWebController(Node):
 
     def handle_enable(self, request, response):
         self.enabled = True
-        self.get_logger().info('orca_00  : enabled')
+        self.get_logger().info('orca_00 : enabled')
         self.enabled_state_pub.publish(Bool(data=True))
         return response
 
     def handle_disable(self, request, response):
         self.enabled = False
-        self.get_logger().info('orca_00  : disabled')
+        self.get_logger().info('orca_00 : disabled')
         self.enabled_state_pub.publish(Bool(data=False))
         return response
 

@@ -7,27 +7,60 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>ORCA丸山ロボット</h1>
   <div id="wrapper">
     <div id="controll-block">
       <h1>nanikahairu</h1>
       <h2>dezaintyouseisuru</h2>
     </div>
+
     <div id="camera-block">
-      <h1>操作ブロック</h1>
-      <button onclick="callEnable()"> enable 呼び出し</button>
-      <button onclick="callDisable()"> disable 呼び出し</button>
-      <button onclick="callSetOffset()"> set_offset 呼び出し</button>
+      <!--orca01-->
       <div class="camera-box">
-        <div id="status">状態: 未確認</div>
+        <!-- Enable / Disable を切り替える2つのボタン -->
+      <button id="enable-button" onclick="callEnable()" >Enable</button>
+      <button id="disable-button" onclick="callDisable()" style="display: none;">Disable</button>
+      <div class="is-enable manual" onclick="toggleMode(this)">
+        <div id="status" style="display: none;">状態: 未確認</div>
         <video id="camera" autoplay muted></video>
         <div class="button-group">
-          <button onclick="sendControlState(0)">Manual</button>
-          <button onclick="sendControlState(1)">Auto</button>
+          <button>32do</button>
+          <button onclick="callSetOffset()">offset</button>
+          <button>arm</button>
         </div>
       </div>
-      <!-- 追加のカメラボックスはここに同様に配置 -->
+      </div>
+      <!--orca02-->
+      <div class="camera-box">
+        <!-- Enable / Disable を切り替える2つのボタン -->
+      <button id="enable-button" onclick="callEnable()" >Enable</button>
+      <button id="disable-button" onclick="callDisable()" style="display: none;">Disable</button>
+      <div class="is-enable manual" onclick="toggleMode(this)">
+        <div id="status" style="display: none;">状態: 未確認</div>
+        <video id="camera" autoplay muted></video>
+        <div class="button-group">
+          <button>32do</button>
+          <button onclick="callSetOffset()">offset</button>
+          <button>arm</button>
+        </div>
+      </div>
+      </div>
+      <!--orca03-->
+      <div class="camera-box">
+        <!-- Enable / Disable を切り替える2つのボタン -->
+      <button id="enable-button" onclick="callEnable()" >Enable</button>
+      <button id="disable-button" onclick="callDisable()" style="display: none;">Disable</button>
+      <div class="is-enable manual" onclick="toggleMode(this)">
+        <div id="status" style="display: none;">状態: 未確認</div>
+        <video id="camera" autoplay muted></video>
+        <div class="button-group">
+          <button>32do</button>
+          <button onclick="callSetOffset()">offset</button>
+          <button>arm</button>
+        </div>
+      </div>
+      </div>
     </div>
+    
   </div>
 
   <script>
@@ -47,13 +80,6 @@
       messageType: 'std_msgs/msg/Int32'
     });
 
-    function sendControlState(value) {
-      const msg = new ROSLIB.Message({ data: value });
-      controlStateTopic.publish(msg);
-      console.log("📤 Sent /orca_00/control_state:", value);
-    }
-
-    // サービス定義
     const enableService = new ROSLIB.Service({
       ros: ros,
       name: '/orca_00/enable',
@@ -72,41 +98,84 @@
       serviceType: 'std_srvs/srv/Empty'
     });
 
-    // 状態表示用トピック購読（Bool型）
     const enabledStateSub = new ROSLIB.Topic({
       ros: ros,
       name: '/orca_00/enabled_state',
       messageType: 'std_msgs/Bool'
     });
 
+    // 状態に応じてボタンの表示を切り替える
     enabledStateSub.subscribe((msg) => {
-      const state = msg.data ? ' Enabled' : 'Disabled';
-      document.getElementById("status").innerText = `状態: ${state}`;
+      const isEnabled = msg.data;
+      document.getElementById("status").innerText = `状態: ${isEnabled ? 'Enabled' : 'Disabled'}`;
+
+      document.getElementById("enable-button").style.display = isEnabled ? "none" : "inline-block";
+      document.getElementById("disable-button").style.display = isEnabled ? "inline-block" : "none";
     });
 
     function callEnable() {
-      const request = new ROSLIB.ServiceRequest({});
-      enableService.callService(request,
-        () => console.log("enable 呼び出し成功"),
-        (error) => console.warn("enable 呼び出し失敗:", error)
-      );
+        const request = new ROSLIB.ServiceRequest({});
+        enableService.callService(request,
+          () => console.log("✅ enable 呼び出し成功"),
+          (error) => console.warn("❌ enable 呼び出し失敗:", error)
+        );
     }
 
     function callDisable() {
-      const request = new ROSLIB.ServiceRequest({});
-      disableService.callService(request,
-        () => console.log("disable 呼び出し成功"),
-        (error) => console.warn("disable 呼び出し失敗:", error)
-      );
+        const request = new ROSLIB.ServiceRequest({});
+        disableService.callService(request,
+          () => console.log("✅ disable 呼び出し成功"),
+          (error) => console.warn("❌ disable 呼び出し失敗:", error)
+        );
     }
 
     function callSetOffset() {
       const request = new ROSLIB.ServiceRequest({});
       setOffsetService.callService(request,
-        () => console.log("set_offset 呼び出し成功"),
-        (error) => console.warn("set_offset 呼び出し失敗:", error)
+        () => console.log("✅ set_offset 呼び出し成功"),
+        (error) => console.warn("❌ set_offset 呼び出し失敗:", error)
       );
     }
+
+    let currentControlState = 0; // 初期状態は Manual
+
+    const manualBtn = document.getElementById("manual-bg-button");
+    const autoBtn = document.getElementById("auto-bg-button");
+
+    function sendControlState(value) {
+      const msg = new ROSLIB.Message({ data: value });
+      controlStateTopic.publish(msg);
+      console.log("📤 Sent /orca_00/control_state:", value);
+    }
+
+    // Manual → Autoに切り替える
+    function switchToAuto() {
+        currentControlState = 1;
+        sendControlState(1);
+        manualBtn.style.display = "none";
+        autoBtn.style.display = "inline-block";
+    }
+
+    // Auto → Manualに切り替える
+    function switchToManual() {
+        currentControlState = 0;
+        sendControlState(0);
+        manualBtn.style.display = "inline-block";
+        autoBtn.style.display = "none";
+    }
+
+    function toggleMode(div) {
+    if (div.classList.contains("manual")) {
+      div.classList.remove("manual");
+      div.classList.add("auto");
+      sendControlState(1);  // 状態送信
+    } else {
+      div.classList.remove("auto");
+      div.classList.add("manual");
+      sendControlState(0);
+    }
+}
+
   </script>
 </body>
 </html>
