@@ -11,7 +11,7 @@ setup(
     data_files=[
         ('share/' + package_name, ['package.xml']),
         (os.path.join('share', package_name, 'srv'), glob('srv/*.srv')),
-        (os.path.join('share', package_name), glob('launch/*launch.[pxy][yma]*')),
+        (os.path.join('share', package_name, 'launch'), glob('launch/*launch.[pxy][yma]*')),
         (os.path.join('share', package_name, 'web_interface'), glob('web_interface/*')),
     ],
     install_requires=['setuptools'],
