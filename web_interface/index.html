@@ -153,6 +153,24 @@
 
     function toggleMode(event, div, robotName) {
       event.stopPropagation();
+    }
+
+    function callSetOffset(robotName) {
+      const req = new ROSLIB.ServiceRequest({});
+      robotInterfaces[robotName].setOffsetService.callService(req,
+        () => console.log(`${robotName} setOffset ✅`),
+        err => console.warn(`${robotName} setOffset ❌`, err)
+      );
+    }
+
+    function sendControlState(robotName, value) {
+      const msg = new ROSLIB.Message({ data: value });
+      robotInterfaces[robotName].controlStateTopic.publish(msg);
+      console.log(`📤 ${robotName} control_state sent:`, value);
+    }
+
+    function toggleMode(event, div, robotName) {
+      event.stopPropagation();
       if (div.classList.contains("manual")) {
         div.classList.remove("manual");
         div.classList.add("auto");
@@ -162,6 +180,14 @@
         div.classList.add("manual");
         sendControlState(robotName, 0);
       }
+    }
+
+    // Auto → Manualに切り替える
+    function switchToManual() {
+        currentControlState = 0;
+        sendControlState(0);
+        manualBtn.style.display = "inline-block";
+        autoBtn.style.display = "none";
     }
 
     document.addEventListener("DOMContentLoaded", () => {
