@@ -14,7 +14,7 @@ class OrcaWebController(Node):
 
         self.set_offset_srv = self.create_service(Empty, f'/{robot_name}/set_offset', self.handle_set_offset)
         self.enable_srv = self.create_service(Empty, f'/{robot_name}/enable', self.handle_enable)
-        self.disable_srv = self.create_service(Empty, f'/{robot_name}/disenable', self.handle_disable)
+        self.disable_srv = self.create_service(Empty, f'/{robot_name}/disnable', self.handle_disable)
 
         self.enabled = False
 
