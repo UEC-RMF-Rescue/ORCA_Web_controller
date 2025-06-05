@@ -19,7 +19,7 @@
         <!-- Enable / Disable を切り替える2つのボタン -->
       <button id="enable-orca_00" onclick="callEnable('orca_00')" ></button>
       <button id="disable-orca_00" onclick="callDisable('orca_00')" style="display: none;"></button>
-      <div class="is-enable manual" onclick="toggleMode(event, this, 'orca_00')">
+      <div class="is-enable auto" onclick="toggleMode(event, this, 'orca_00')">
         <div id="status-orca_00" style="display: none;">状態: 未確認</div>
         <video id="camera" autoplay muted></video>
         <div class="button-group">
@@ -34,7 +34,7 @@
         <!-- Enable / Disable を切り替える2つのボタン -->
       <button id="enable-orca_01" onclick="callEnable('orca_01')" ></button>
       <button id="disable-orca_01" onclick="callDisable('orca_01')" style="display: none;"></button>
-      <div class="is-enable manual" onclick="toggleMode(event, this, 'orca_01')">
+      <div class="is-enable auto" onclick="toggleMode(event, this, 'orca_01')">
         <div id="status-orca_01" style="display: none;">状態: 未確認</div>
         <video id="camera" autoplay muted></video>
         <div class="button-group">
@@ -49,7 +49,7 @@
         <!-- Enable / Disable を切り替える2つのボタン -->
       <button id="enable-orca_02" onclick="callEnable('orca_02')" ></button>
       <button id="disable-orca_02" onclick="callDisable('orca_02')" style="display: none;"></button>
-      <div class="is-enable manual" onclick="toggleMode(event, this, 'orca_02')">
+      <div class="is-enable auto" onclick="toggleMode(event, this, 'orca_02')">
         <div id="status-orca_02" style="display: none;">状態: 未確認</div>
         <video id="camera" autoplay muted></video>
         <div class="button-group">
@@ -96,7 +96,7 @@
         }),
         disableService: new ROSLIB.Service({
           ros,
-          name: `/${robotName}/disnable`,
+          name: `/${robotName}/disable`,
           serviceType: 'std_srvs/srv/Empty'
         }),
         setOffsetService: new ROSLIB.Service({
@@ -111,28 +111,40 @@
         })
       };
 
-      // ボタンIDが "enable-orca_00", "disable-orca_00" のように付けられている想定
-      robotInterfaces[robotName].enabledStateSub.subscribe(msg => {
-        const isEnabled = msg.data;
-        document.getElementById(`status-${robotName}`).innerText = `状態: ${isEnabled ? 'Enabled' : 'Disabled'}`;
-        document.getElementById(`enable-${robotName}`).style.display = isEnabled ? "none" : "inline-block";
-        document.getElementById(`disable-${robotName}`).style.display = isEnabled ? "inline-block" : "none";
-      });
+    // ボタンIDが "enable-orca_00", "disable-orca_00" のように付けられている想定
+    /*robotInterfaces[robotName].enabledStateSub.subscribe(msg => {
+      const isEnabled = msg.data;
+      document.getElementById(`status-${robotName}`).innerText = `状態: ${isEnabled ? 'Enabled' : 'Disabled'}`;
+      document.getElementById(`enable-${robotName}`).style.display = isEnabled ? "none" : "inline-block";
+      document.getElementById(`disable-${robotName}`).style.display = isEnabled ? "inline-block" : "none";
+      });*/
     });
 
     // コントロール関数を汎用化
     function callEnable(robotName) {
       const req = new ROSLIB.ServiceRequest({});
       robotInterfaces[robotName].enableService.callService(req,
-        () => console.log(`${robotName} enable ✅`),
+        () => {
+          console.log(`${robotName} enable ✅`);
+          // 成功したらボタン切り替え
+          document.getElementById(`enable-${robotName}`).style.display = "none";
+          document.getElementById(`disable-${robotName}`).style.display = "inline-block";
+          document.getElementById(`status-${robotName}`).innerText = `状態: Enabled`;
+        },
         err => console.warn(`${robotName} enable ❌`, err)
       );
     }
 
-    function callDisable(robotName) {
-      const req = new ROSLIB.ServiceRequest({});
+  function callDisable(robotName) {
+    const req = new ROSLIB.ServiceRequest({});
       robotInterfaces[robotName].disableService.callService(req,
-        () => console.log(`${robotName} disable ✅`),
+        () => {
+          console.log(`${robotName} disable ✅`);
+          // 成功したらボタン切り替え
+          document.getElementById(`enable-${robotName}`).style.display = "inline-block";
+          document.getElementById(`disable-${robotName}`).style.display = "none";
+          document.getElementById(`status-${robotName}`).innerText = `状態: Disabled`;
+        },
         err => console.warn(`${robotName} disable ❌`, err)
       );
     }
